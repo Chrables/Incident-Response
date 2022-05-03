@@ -1,0 +1,13 @@
+
+$SourceDir = "<File Share to Search>"
+$Output = "<CSV Output>"
+
+$Keywords = "*passport*","*password*","*license*"
+
+
+if(!(Test-Path -Path $SourceDir)){ return "Directory does not exist." }
+$Files = Get-Childitem –Path $SourceDir -Include $Keywords -File -Recurse -ErrorAction SilentlyContinue
+
+Write-Host "$($Files.Count) files found in $SourceDir"
+$Files | Select Name,Directory | Export-CSV $Output -NoTypeInformation
+Write-Host "Saved to $Output"
