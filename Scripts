@@ -15,7 +15,7 @@ def create_encoded_jwt():
 
     # OAuth Claims
     payloadData = {
-        "aud": "https://canva.okta.com/oauth2/v1/token",
+        "aud": "https://<YOURDOMAIN>.okta.com/oauth2/v1/token",
         "iss": clientId,
         "sub": clientId,
         "exp": expiryTime,
