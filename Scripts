@@ -1,0 +1,95 @@
+#!/usr/bin/python3
+import jwt
+import json
+import requests
+import os
+import time
+from cryptography.hazmat.primitives import serialization
+
+def create_encoded_jwt():
+    # Set token expiry for 10 minutes
+    expiryTime = time.time() + 600
+
+    # JWK Client ID
+    clientId = "clientId"
+
+    # OAuth Claims
+    payloadData = {
+        "aud": "https://canva.okta.com/oauth2/v1/token",
+        "iss": clientId,
+        "sub": clientId,
+        "exp": expiryTime,
+    }
+
+    # Private JWK
+    private_key = open("jwtRS256.key", "r").read()
+
+    key = serialization.load_pem_private_key(private_key.encode(), password=None)
+
+    token = jwt.encode(payload=payload_data, key=key, algorithm="RS256")
+
+
+def obtain_access_token():
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+
+    data = {
+        "grant_type": "client_credentials",
+        "scope": "okta.users.manage",
+        "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        "client_assertion": token,
+    }
+
+    response = requests.post(
+        "https://<YOURDOMAIN>.okta.com/oauth2/v1/token", headers=headers, data=data
+    )
+
+    # Grab Access Token from API response
+    jsonResponse = response.json()
+    accessToken = jsonResponse["access_token"]
+
+
+
+
+OKTA_DOMAIN = "<YOURDOMAIN>.okta.com"
+
+# Calls the "clear user sessions" API
+# https://developer.okta.com/docs/reference/api/users/#clear-user-sessions
+# We set oauthTokens to true by default
+def revoke(user: str, api_key: str) -> bool:
+
+        def convert_username_to_userid():
+        headers = {
+        "Accept": "application/json",
+        "Authorization": f"SSWS" + accessToken,
+        "Content-Type": "application/json",
+        }
+
+        params = (
+            ("filter", "profile.login eq "{username}""),
+        )
+
+        response = requests.get(f"https://<YOURDOMAIN>.okta.com/api/v1/users?filter=profile.login%20eq%20%22{username}%22", headers=headers, params=params)
+
+        #Grab userId from API response
+        userResponse = response.json()
+        userId = userResponse["id"]
+    
+    #Revoke using userId
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": f"SSWS " + accessToken,  # -> SSWS Auth Token
+    }
+    
+    path = f"https://{OKTA_DOMAIN}/api/v1/users/" + userId + "/sessions?oauthTokens=true"
+    
+    response = requests.delete(path, headers=headers)
+   
+    if response.status_code == 204:
+        return
+    print("Error calling API")
+    print(f"{response.status_code} - {response.text}")
+    return
