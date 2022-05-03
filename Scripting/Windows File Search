@@ -1,3 +1,5 @@
+#This PowerShell script will search for document names containing specific keywords.
+#Can be useful for searching for PII, ransomware file extensions, etc.
 
 $SourceDir = "<File Share to Search>"
 $Output = "<CSV Output>"
