@@ -60,7 +60,7 @@ OKTA_DOMAIN = "<YOURDOMAIN>.okta.com"
 # We set oauthTokens to true by default
 def revoke(user: str, api_key: str) -> bool:
 
-        def convert_username_to_userid():
+    def convert_username_to_userid():
         headers = {
         "Accept": "application/json",
         "Authorization": f"SSWS" + accessToken,
